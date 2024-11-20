@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>DDLoadScreen</title>
+	<link rel="stylesheet" type="text/css" href="styles/main.css">
+	<script type="text/javascript" src="js/thirdparty/jquery.js"></script>
+</head>
+
+<body>
+	<div id="background">
+		<!-- <img id="icon" src="../loading.png" style="width: 1vh;height: 1dvw;"></img> -->
+		<ul class="consoleHeader">
+			<img class="icon" src="resources/emblem.png"></img>
+			<span id="serverName">Подключение...</span>
+			<span id="serverMap" class="serverMap">[Destination Unknown]</span>
+		</ul>
+		<div class="consoleBody">
+
+		</div>
+		<div class="consoleFooter">
+			<span id="steamID">СтимИД: 76561198163261508</span>
+			<span style="font-size: smaller;font-weight: 100;float:left;">© Default_OS</span>
+		</div>
+		<div class="consoleInfo">
+			<div class="radarnoise">
+				<div class="text">ДАННЫЕ О КАРТЕ ОТСУТСТВУЮТ</div>
+			</div>
+		</div>
+	</div>
+	<div id="overlay">
+		<div id="scanline"></div>
+	</div>
+	<audio autoplay>
+		<source src="resources/BootUp.mp3" type="audio/mpeg" />
+	</audio>
+	<script type="text/javascript">
+		var isDev = true;
+		window.onload = function () {
+			setTimeout(function () {
+				if (!isDev) return;
+				setGameDetails("Default's TestBox", "https:/example.com", "cs_havana",
+					32, "76561198163261508", "sandbox", 1, "ru", "Sandbox")
+				for (var i = 0; i < 50; i++) {
+					PrintConsoleLine(Math.random(), Math.random() > 0.7);
+				}
+			}, 1000)
+		}
+		function PrintConsoleLine(str,time,style) {
+			if (time == null) time = true;
+			if (style == null) style = "";
+			var data = new Date();
+			var line = $("<span style='" + style + "'>" +
+				(time ? ("[" + data.toLocaleTimeString('ru-RU') + "] ") : "") +
+				str + "</span></br>");
+			$(".consoleBody").append(line);
+			$(".consoleBody").animate({
+				scrollTop: line.offset().top
+			}, 20);
+		}
+		function setGameDetails(svName, lurl, map, maxply, steamid, gm, vol, lang, gmName) {
+			$("#serverName").text(svName + " - " + gmName);
+			$("#serverMap").text('[' + map + ']');
+			$("#steamID").text('СтимИД: ' + steamid);
+			var errs = 0;
+			const onImageError = function () {
+				$(this).remove();
+				errs += 1;
+				if (errs < 2) return;
+				$(".radarnoise").addClass("activate");
+			}
+			var map_radar = $("<img src='resources/maps/" + map + "_radar.png'></img>")
+			map_radar.on("error", onImageError);
+			$(".consoleInfo").append(map_radar);
+			var map_preview = $("<img src='resources/maps/" + map + "_preview.png'></img>")
+			map_preview.on("error", onImageError);
+			$(".consoleInfo").append(map_preview);
+		}
+		function GameDetails(svName, lurl, map, maxply, steamid, gm, vol, lang, gmName) {
+			isDev = false;
+			setGameDetails(svName, lurl, map, maxply, steamid, gm, vol, lang, gmName);
+		}
+		function SetFilesTotal(total) {
+			PrintConsoleLine("Количество скриптов назначенных для скачивания: " + total);
+		}
+		function DownloadingFile(file) {
+			PrintConsoleLine("[Скачивание] " + file);
+		}
+		function SetFilesNeeded(needed) {
+			PrintConsoleLine("Количество файлов для скачивания: " + needed);
+		}
+		function SetStatusChanged(status) {
+			PrintConsoleLine("[Статус загрузки]" + status);
+		}
+	</script>
+</body>
+
+</html>
